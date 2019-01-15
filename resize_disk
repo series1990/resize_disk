@@ -1,0 +1,396 @@
+#!/bin/bash
+
+##MAINMENU##
+##################
+main_menu()
+{
+        clear && echo ""
+echo "Welcome to Resize Disk On Linux"
+echo ""
+
+	PS3="Select Number [1-4]:"
+	main_menu=("CentOS" "Ubuntu" "Debian" "Exit")
+	select os in "${main_menu[@]}"; do
+		if [ "$os" = "Exit" ]; then
+			echo "Thank you for using Program!" && sleep 3 && clear
+		exit 0
+		elif [ "$os" = "CentOS" ]; then
+	cent_menu
+		elif [ "$os" = "Ubuntu" ]; then
+	ubuntu_menu
+		elif [ "$os" = "Debian" ]; then
+	debian_menu
+		fi
+done
+}
+################
+
+##CentOS_Menu##
+##################
+cent_menu()
+{
+        clear && echo ""
+echo "Welcome to Resize Disk On Linux"
+echo ""
+
+	PS3="Select Number [1-3]:"
+	cent_menu=("CentOS 6" "CentOS 7" "Back")
+	select cent in "${cent_menu[@]}"; do
+		if [ "$cent" = "CentOS 6" ]; then
+	cent6_menu
+		elif [ "$cent" = "CentOS 7" ]; then
+	cent7_menu
+		elif [ "$cent" = "Back" ]; then
+	main_menu
+		fi
+done
+}
+################
+
+##CentOS6##
+##################
+cent6_menu()
+{
+        clear && echo ""
+echo "================================================================================"
+echo "Welcome to Resize Disk On CentOS 6"
+echo "Step 1 Select Resize Partition to change the size and the server will reboot automatically"
+echo "Step 2 When the server is started, select Resize Disk to change disk size"
+echo "================================================================================"
+echo ""
+
+	PS3="Select Number [1-2]:"
+	cent6_menu=("Resize Partition" "Resize Disk" "Back")
+	select cent6 in "${cent6_menu[@]}"; do
+		if [ "$cent6" = "Resize Partition" ]; then
+	cent6_resize_pt
+		elif [ "$cent6" = "Resize Disk" ]; then
+	cent6_resize
+		elif [ "$cent6" = "Back" ]; then
+	cent_menu
+		fi
+done
+}
+##################
+
+##CentOS6_Resizept##
+##################
+cent6_resize_pt()
+{
+clear 
+while true; do
+    read -p "Do you want to continue running this script resize partition? [y/n] " yn
+    case $yn in
+        [Yy]*  | "" )
+			echo -e "d\n2\nn\np\n2\n\n+\nt\n2\n8e\nw" | fdisk /dev/sda
+			reboot
+			exit;;
+        [Nn]* ) 
+			exit;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
+}
+##################
+
+##CentOS6_Resize##
+##################
+cent6_resize()
+{
+while true; do
+    read -p "Do you want to continue running this script resize disk? [y/n] " yn
+    case $yn in
+        [Yy]*  | "" )
+			pvresize /dev/sda2
+			lvextend -l +100%FREE /dev/mapper/VolGroup-lv_root
+			resize2fs /dev/mapper/VolGroup-lv_root
+			df -h
+			exit;;
+        [Nn]* ) 
+			exit;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
+}
+##################
+
+##CentOS7##
+##################
+cent7_menu()
+{
+        clear && echo ""
+echo "================================================================================"
+echo "Welcome to Resize Disk On CentOS 7"
+echo "Step 1 Select Resize Disk to change size"
+echo "================================================================================"
+echo ""
+
+	PS3="Select Number [1-2]:"
+	cent7_menu=("Resize Disk" "Back")
+	select cent7 in "${cent7_menu[@]}"; do
+		if [ "$cent7" = "Resize Disk" ]; then
+	cent7_resize
+		elif [ "$cent7" = "Back" ]; then
+	cent_menu
+		fi
+done
+}
+##################
+
+##CentOS7_Resize##
+##################
+cent7_resize()
+{
+while true; do
+    read -p "Do you want to continue running this script resize disk? [y/n] " yn
+    case $yn in
+        [Yy]*  | "" )
+			echo -e "resizepart 2 100%\nquit" | parted
+			pvresize /dev/sda2
+			lvextend -l +100%FREE /dev/mapper/centos-root
+			xfs_growfs /dev/mapper/centos-root
+			df -h
+			exit;;
+        [Nn]* ) 
+			exit;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
+}
+##################
+
+##Ubuntu_Menu##
+##################
+ubuntu_menu()
+{
+        clear && echo ""
+echo "Welcome to Resize Disk On Linux"
+echo ""
+
+	PS3="Select Number [1-3]:"
+	ubuntu_menu=("Ubuntu 16" "Ubuntu 18" "Back")
+	select ubuntu in "${ubuntu_menu[@]}"; do
+		if [ "$ubuntu" = "Ubuntu 16" ]; then
+	ubuntu16_menu
+		elif [ "$ubuntu" = "Ubuntu 18" ]; then
+	ubuntu18_menu
+		elif [ "$ubuntu" = "Back" ]; then
+	main_menu
+		fi
+done
+}
+################
+
+##ubuntu16##
+##################
+ubuntu16_menu()
+{
+        clear && echo ""
+echo "================================================================================"
+echo "Welcome to Resize Disk On Ubuntu 16"
+echo "Step 1 Select Resize Disk to change size"
+echo "================================================================================"
+echo ""
+
+	PS3="Select Number [1-2]:"
+	ubuntu16_menu=("Resize Disk" "Back")
+	select ubuntu16 in "${ubuntu16_menu[@]}"; do
+		if [ "$ubuntu16" = "Resize Disk" ]; then
+	ubuntu16_resize
+		elif [ "$ubuntu16" = "Back" ]; then
+	ubuntu_menu
+		fi
+done
+}
+##################
+
+##ubuntu16_Resize##
+##################
+ubuntu16_resize()
+{
+while true; do
+    read -p "Do you want to continue running this script resize partition? [y/n] " yn
+    case $yn in
+        [Yy]*  | "" )
+			echo -e "resizepart 2 100%\nresizepart 5 100%\nquit" | parted
+			pvresize /dev/sda5
+			lvextend -l +100%FREE /dev/ubuntu-vg/root
+			resize2fs /dev/ubuntu-vg/root
+			df -h
+			exit;;
+        [Nn]* ) 
+			exit;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
+}
+##################
+
+##ubuntu18##
+##################
+ubuntu18_menu()
+{
+        clear && echo ""
+echo "================================================================================"
+echo "Welcome to Resize Disk On Ubuntu 16"
+echo "Step 1 Select Resize Disk to change size"
+echo "================================================================================"
+echo ""
+
+	PS3="Select Number [1-2]:"
+	ubuntu18_menu=("Resize Disk" "Back")
+	select ubuntu18 in "${ubuntu18_menu[@]}"; do
+		if [ "$ubuntu18" = "Resize Disk" ]; then
+	ubuntu18_resize
+		elif [ "$ubuntu18" = "Back" ]; then
+	ubuntu_menu
+		fi
+done
+}
+##################
+
+##ubuntu18_Resize##
+##################
+ubuntu18_resize()
+{
+while true; do
+    read -p "Do you want to continue running this script resize partition? [y/n] " yn
+    case $yn in
+        [Yy]*  | "" )
+			echo -e "d\n3\nn\n3\n\n\nt\n3\n31\nw" | fdisk /dev/sda
+			pvresize /dev/sda3
+			lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv
+			resize2fs /dev/ubuntu-vg/ubuntu-lv
+			df -h
+			exit;;
+        [Nn]* ) 
+			exit;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
+}
+##################
+
+##Debian_Menu##
+##################
+debian_menu()
+{
+        clear && echo ""
+echo "Welcome to Resize Disk On Linux"
+echo ""
+
+	PS3="Select Number [1-3]:"
+	debian_menu=("Debian 8" "Debian 9" "Back")
+	select debian in "${debian_menu[@]}"; do
+		if [ "$debian" = "Debian 8" ]; then
+	debian8_menu
+		elif [ "$debian" = "Debian 9" ]; then
+	debian9_menu
+		elif [ "$debian" = "Back" ]; then
+	main_menu
+		fi
+done
+}
+################
+
+##Debian8##
+##################
+debian8_menu()
+{
+        clear && echo ""
+echo "================================================================================"
+echo "Welcome to Resize Disk On Ubuntu 16"
+echo "Step 1 Select Resize Disk to change size"
+echo "================================================================================"
+echo ""
+
+	PS3="Select Number [1-2]:"
+	debian8_menu=("Resize Disk" "Back")
+	select debian8 in "${debian8_menu[@]}"; do
+		if [ "$debian8" = "Resize Disk" ]; then
+	debian8_resize
+		elif [ "$debian8" = "Back" ]; then
+	debian_menu
+		fi
+done
+}
+##################
+
+##Debian8_Resize##
+##################
+debian8_resize()
+{
+while true; do
+    read -p "Do you want to continue running this script resize partition? [y/n] " yn
+    case $yn in
+        [Yy]*  | "" )
+			apt-get install parted -y
+			echo -e "resizepart 2 100%\nresizepart 5 100%\nquit" | parted
+			pvresize /dev/sda5
+			lvextend -l +100%FREE /dev/debian-vg/root
+			resize2fs /dev/debian-vg/root
+			df -h
+			exit;;
+        [Nn]* ) 
+			exit;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
+}
+##################
+
+##Debian9##
+##################
+debian9_menu()
+{
+        clear && echo ""
+echo "================================================================================"
+echo "Welcome to Resize Disk On Ubuntu 16"
+echo "Step 1 Select Resize Disk to change size"
+echo "================================================================================"
+echo ""
+
+	PS3="Select Number [1-2]:"
+	debian9_menu=("Resize Disk" "Back")
+	select debian9 in "${debian9_menu[@]}"; do
+		if [ "$debian9" = "Resize Disk" ]; then
+	debian9_resize
+		elif [ "$debian9" = "Back" ]; then
+	debian_menu
+		fi
+done
+}
+##################
+
+##Debian9_Resize##
+##################
+debian9_resize()
+{
+while true; do
+    read -p "Do you want to continue running this script resize partition? [y/n] " yn
+    case $yn in
+        [Yy]*  | "" )
+			apt-get install parted -y
+			echo -e "resizepart 2 100%\nresizepart 5 100%\nquit" | parted
+			pvresize /dev/sda5
+			lvextend -l +100%FREE /dev/debian-vg/root
+			resize2fs /dev/debian-vg/root
+			df -h 
+			exit;;
+        [Nn]* ) 
+			exit;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
+}
+##################
+
+##WELCOME##
+#########################
+##START WELCOME MESSAGE##
+        clear && echo ""
+echo "Welcome to Resize Disk On Linux"
+echo ""
+main_menu
+##END WELCOME MESSAGE##
+#######################
